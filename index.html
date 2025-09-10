@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전공과 외식서비스 2반 카페 주문서</title>
+    <title>☕ 위드인카페 주문 시스템</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
         * {
@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f5f5dc 0%, #d2b48c 100%); /* 따뜻한 카페 느낌 배경색 */
+            background: linear-gradient(135deg, #f5f5dc 0%, #d2b48c 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -46,12 +46,53 @@
             font-size: 1.2em;
             opacity: 0.95;
         }
+        
+        .mode-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease;
+        }
+        
+        .mode-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            color: #4a2b1a;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
 
-        .order-form {
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .mode-btn.active {
+            background: #FFD700;
+            color: #333;
+        }
+
+        .content-area {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .content-area.active {
+            display: block;
+        }
+
+        .order-form, .order-history-section {
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
 
         .form-section {
@@ -75,13 +116,13 @@
             gap: 10px;
         }
 
-        .location-grid {
+        .location-grid, .menu-grid, .options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
         }
-
-        .location-item {
+        
+        .location-item, .menu-item, .teacher-item {
             padding: 15px;
             border: 3px solid #e0e0e0;
             border-radius: 15px;
@@ -92,22 +133,22 @@
             background: #f8f9fa;
         }
 
-        .location-item:hover {
+        .location-item:hover, .menu-item:hover, .teacher-item:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-color: #667eea;
         }
 
-        .location-item.selected {
+        .location-item.selected, .menu-item.selected {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
             transform: scale(1.05);
         }
-
+        
         .teacher-grid {
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px;
             margin-top: 15px;
             padding: 15px;
@@ -120,56 +161,10 @@
             animation: slideDown 0.3s ease;
         }
 
-        .teacher-item {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.95em;
-            background: white;
-        }
-
-        .teacher-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            border-color: #667eea;
-        }
-
         .teacher-item.selected {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: white;
             border-color: transparent;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-        }
-
-        .menu-item {
-            padding: 20px;
-            border: 3px solid #e0e0e0;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .menu-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-color: #667eea;
-        }
-
-        .menu-item.selected {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: white;
-            border-color: transparent;
-            transform: scale(1.05);
         }
 
         .menu-emoji {
@@ -193,7 +188,7 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
-
+        
         .temp-option {
             padding: 20px;
             border: 3px solid #e0e0e0;
@@ -240,7 +235,7 @@
 
         .radio-group {
             display: flex;
-            gap: 30px;
+            gap: 15px;
         }
 
         .radio-label {
@@ -264,12 +259,29 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
+            display: none;
         }
-
+        
+        .radio-label::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        
         .radio-label:has(input:checked) {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
+        }
+
+        .radio-label:has(input:checked)::before {
+            border-color: white;
+            background: white;
+            box-shadow: 0 0 0 4px #667eea;
         }
 
         .tumbler-numbers {
@@ -309,12 +321,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
         }
 
         .option-item {
@@ -418,24 +424,6 @@
             background: #d0d0d0;
         }
 
-        .order-history-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-top: 30px;
-        }
-
-        .order-history-section h2 {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .order-table-container {
             overflow-x: auto;
         }
@@ -459,8 +447,24 @@
             color: #555;
         }
 
-        .order-table tbody tr:hover {
+        .order-table tbody tr.completed {
+            background-color: #e6f9ed;
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+        
+        .order-table tbody tr.completed .complete-checkbox:checked {
+            background-color: #38a169;
+        }
+
+        .order-table tbody tr:not(.completed):hover {
             background-color: #f9f9f9;
+        }
+
+        .complete-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
         }
 
         @keyframes slideDown {
@@ -474,23 +478,17 @@
             }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 2em;
             }
-            .location-grid,
-            .menu-grid,
-            .options-grid {
+            .location-grid, .menu-grid, .options-grid, .temp-options, .radio-group, .action-buttons {
                 grid-template-columns: 1fr;
-            }
-            .temp-options {
-                grid-template-columns: 1fr;
-            }
-            .radio-group {
-                flex-direction: column;
-            }
-            .action-buttons {
-                flex-direction: column;
             }
             .tumbler-numbers {
                 grid-template-columns: repeat(2, 1fr);
@@ -502,209 +500,131 @@
     <div class="container">
         <div class="header">
             <h3>부천상록학교</h3>
-            <h1>☕ 전공과 외식서비스2반 카페 주문서</h1>
-            <p>커피를 만듭니다. 행복을 전합니다.</p>
+            <h1>☕ 전공과 외식서비스2반 카페 주문 시스템</h1>
+            <p>커피를 만듭니다. 꿈을 만듭니다.</p>
         </div>
 
-        <div class="order-form">
-            <div class="form-section">
-                <div class="section-title">
-                    <span>📍</span>
-                    <span>위치 선택</span>
-                </div>
-                <div class="location-grid">
-                    <div class="location-item" data-location="전공과 연구실">전공과 연구실</div>
-                    <div class="location-item" data-location="전1-1">전1-1</div>
-                    <div class="location-item" data-location="전1-2">전1-2</div>
-                    <div class="location-item" data-location="전1-3">전1-3</div>
-                    <div class="location-item" data-location="전2-1">전2-1</div>
-                    <div class="location-item" data-location="전2-2">전2-2</div>
-                    <div class="location-item" data-location="전2-3">전2-3</div>
-                </div>
-            </div>
+        <div class="mode-switcher">
+            <button class="mode-btn active" onclick="switchMode('order')">🛒 주문하기</button>
+            <button class="mode-btn" onclick="switchMode('admin')">📋 주문 현황</button>
+        </div>
 
-            <div class="form-section">
-                <div class="section-title">
-                    <span>👤</span>
-                    <span>선생님 선택</span>
-                </div>
-                
-                <div id="noLocationMsg" style="text-align: center; color: #999; padding: 20px;">
-                    먼저 위치를 선택해주세요
+        <div id="orderMode" class="content-area active">
+            <div class="order-form">
+                <div class="form-section">
+                    <div class="section-title"><span>📍</span><span>위치 선택</span></div>
+                    <div class="location-grid">
+                        <div class="location-item" data-location="전공과 연구실">전공과 연구실</div>
+                        <div class="location-item" data-location="전1-1">전1-1</div>
+                        <div class="location-item" data-location="전1-2">전1-2</div>
+                        <div class="location-item" data-location="전1-3">전1-3</div>
+                        <div class="location-item" data-location="전2-1">전2-1</div>
+                        <div class="location-item" data-location="전2-2">전2-2</div>
+                        <div class="location-item" data-location="전2-3">전2-3</div>
+                    </div>
                 </div>
 
-                <div class="teacher-grid" id="teacherGrid"></div>
-            </div>
+                <div class="form-section">
+                    <div class="section-title"><span>👤</span><span>선생님 선택</span></div>
+                    <div id="noLocationMsg" style="text-align: center; color: #999; padding: 20px;">먼저 위치를 선택해주세요</div>
+                    <div class="teacher-grid" id="teacherGrid"></div>
+                </div>
 
-            <div class="form-section">
-                <div class="section-title">
-                    <span>☕</span>
-                    <span>메뉴 선택</span>
-                </div>
-                <div class="menu-grid">
-                    <div class="menu-item" data-menu="아메리카노">
-                        <div class="menu-emoji">☕</div>
-                        <div class="menu-name">아메리카노</div>
-                    </div>
-                    <div class="menu-item" data-menu="카페라떼">
-                        <div class="menu-emoji">🥛</div>
-                        <div class="menu-name">카페라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="바닐라 라떼">
-                        <div class="menu-emoji">🍦</div>
-                        <div class="menu-name">바닐라 라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="아샷추">
-                        <div class="menu-emoji">💪</div>
-                        <div class="menu-name">아샷추</div>
-                        <div class="menu-desc">(아이스티+샷)</div>
-                    </div>
-                    <div class="menu-item" data-menu="초코라떼">
-                        <div class="menu-emoji">🍫</div>
-                        <div class="menu-name">초코라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="말차라떼">
-                        <div class="menu-emoji">🍵</div>
-                        <div class="menu-name">말차라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="밀크티라떼">
-                        <div class="menu-emoji">🧋</div>
-                        <div class="menu-name">밀크티라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="요거트라떼">
-                        <div class="menu-emoji">🍦</div>
-                        <div class="menu-name">요거트라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="검정콩라떼">
-                        <div class="menu-emoji">🥜</div>
-                        <div class="menu-name">검정콩라떼</div>
-                    </div>
-                    <div class="menu-item" data-menu="복숭아 아이스티">
-                        <div class="menu-emoji">🍑</div>
-                        <div class="menu-name">복숭아 아이스티</div>
-                    </div>
-                    <div class="menu-item" data-menu="레몬 아이스티">
-                        <div class="menu-emoji">🍋</div>
-                        <div class="menu-name">레몬 아이스티</div>
+                <div class="form-section">
+                    <div class="section-title"><span>☕</span><span>메뉴 선택</span></div>
+                    <div class="menu-grid">
+                        <div class="menu-item" data-menu="아메리카노"><div class="menu-emoji">☕</div><div class="menu-name">아메리카노</div></div>
+                        <div class="menu-item" data-menu="카페라떼"><div class="menu-emoji">🥛</div><div class="menu-name">카페라떼</div></div>
+                        <div class="menu-item" data-menu="바닐라 라떼"><div class="menu-emoji">🍦</div><div class="menu-name">바닐라 라떼</div></div>
+                        <div class="menu-item" data-menu="아샷추"><div class="menu-emoji">💪</div><div class="menu-name">아샷추</div><div class="menu-desc">(아이스티+샷)</div></div>
+                        <div class="menu-item" data-menu="초코라떼"><div class="menu-emoji">🍫</div><div class="menu-name">초코라떼</div></div>
+                        <div class="menu-item" data-menu="말차라떼"><div class="menu-emoji">🍵</div><div class="menu-name">말차라떼</div></div>
+                        <div class="menu-item" data-menu="밀크티라떼"><div class="menu-emoji">🧋</div><div class="menu-name">밀크티라떼</div></div>
+                        <div class="menu-item" data-menu="요거트라떼"><div class="menu-emoji">🍦</div><div class="menu-name">요거트라떼</div></div>
+                        <div class="menu-item" data-menu="검정콩라떼"><div class="menu-emoji">🥜</div><div class="menu-name">검정콩라떼</div></div>
+                        <div class="menu-item" data-menu="복숭아 아이스티"><div class="menu-emoji">🍑</div><div class="menu-name">복숭아 아이스티</div></div>
+                        <div class="menu-item" data-menu="레몬 아이스티"><div class="menu-emoji">🍋</div><div class="menu-name">레몬 아이스티</div></div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-section">
-                <div class="section-title">
-                    <span>🌡️</span>
-                    <span>HOT / ICE 선택</span>
-                </div>
-                <div class="temp-options">
-                    <div class="temp-option hot" data-temp="HOT">🔥 HOT</div>
-                    <div class="temp-option ice" data-temp="ICE">🧊 ICE</div>
-                </div>
-                <div id="tempWarning" style="color: #ff6b6b; margin-top: 10px; display: none; font-weight: bold; text-align: center;">
-                    ⚠️ 선택한 메뉴는 ICE만 가능합니다!
-                </div>
-            </div>
-
-            <div class="form-section">
-                <div class="section-title">
-                    <span>🥤</span>
-                    <span>텀블러 유무</span>
-                </div>
-                <div class="tumbler-section">
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="tumbler" value="yes">
-                            <span class="radio-text">텀블러 있음</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="tumbler" value="no" checked>
-                            <span class="radio-text">텀블러 없음</span>
-                        </label>
+                <div class="form-section">
+                    <div class="section-title"><span>🌡️</span><span>HOT / ICE 선택</span></div>
+                    <div class="temp-options">
+                        <div class="temp-option hot" data-temp="HOT">🔥 HOT</div>
+                        <div class="temp-option ice" data-temp="ICE">🧊 ICE</div>
                     </div>
-                    <div class="tumbler-numbers" id="tumblerNumbers">
-                        <div class="tumbler-num-btn" data-number="1">1번</div>
-                        <div class="tumbler-num-btn" data-number="2">2번</div>
-                        <div class="tumbler-num-btn" data-number="3">3번</div>
-                        <div class="tumbler-num-btn" data-number="4">4번</div>
-                        <div class="tumbler-num-btn" data-number="5">5번</div>
-                        <div class="tumbler-num-btn" data-number="6">6번</div>
-                        <div class="tumbler-num-btn" data-number="7">7번</div>
-                        <div class="tumbler-num-btn" data-number="8">8번</div>
+                    <div id="tempWarning" style="color: #ff6b6b; margin-top: 10px; display: none; font-weight: bold; text-align: center;"></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title"><span>🥤</span><span>컵 선택</span></div>
+                    <div class="tumbler-section">
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="tumbler" value="다회용 컵" checked>
+                                <span class="radio-text">다회용 컵</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="tumbler" value="개인 텀블러">
+                                <span class="radio-text">개인 텀블러</span>
+                            </label>
+                        </div>
+                        <div class="tumbler-numbers" id="tumblerNumbers">
+                            <div class="tumbler-num-btn" data-number="1">1번</div>
+                            <div class="tumbler-num-btn" data-number="2">2번</div>
+                            <div class="tumbler-num-btn" data-number="3">3번</div>
+                            <div class="tumbler-num-btn" data-number="4">4번</div>
+                            <div class="tumbler-num-btn" data-number="5">5번</div>
+                            <div class="tumbler-num-btn" data-number="6">6번</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-section">
-                <div class="section-title">
-                    <span>📝</span>
-                    <span>기타사항</span>
+                <div class="form-section">
+                    <div class="section-title"><span>📝</span><span>기타사항</span></div>
+                    <div class="options-grid">
+                        <label class="option-item"><input type="checkbox" class="option-checkbox" value="샷추가"><span>샷추가</span></label>
+                        <label class="option-item"><input type="checkbox" class="option-checkbox" value="시럽추가"><span>시럽추가</span></label>
+                        <label class="option-item"><input type="checkbox" class="option-checkbox" value="연하게"><span>연하게</span></label>
+                        <label class="option-item"><input type="checkbox" class="option-checkbox" value="얼음 많이"><span>얼음 많이</span></label>
+                    </div>
                 </div>
-                <div class="options-grid">
-                    <label class="option-item">
-                        <input type="checkbox" class="option-checkbox" value="샷추가">
-                        <span>샷추가</span>
-                    </label>
-                    <label class="option-item">
-                        <input type="checkbox" class="option-checkbox" value="시럽추가">
-                        <span>시럽추가</span>
-                    </label>
-                    <label class="option-item">
-                        <input type="checkbox" class="option-checkbox" value="연하게">
-                        <span>연하게</span>
-                    </label>
-                    <label class="option-item">
-                        <input type="checkbox" class="option-checkbox" value="얼음 많이">
-                        <span>얼음 많이</span>
-                    </label>
-                </div>
-            </div>
 
-            <div class="order-summary">
-                <div class="summary-title">✔️ 주문 확인</div>
-                <div class="summary-item">
-                    <div class="summary-label">위치/선생님:</div>
-                    <div class="summary-value" id="summaryLocationTeacher">선택 안 함</div>
+                <div class="order-summary">
+                    <div class="summary-title">✔️ 주문 확인</div>
+                    <div class="summary-item"><div class="summary-label">위치/선생님:</div><div class="summary-value" id="summaryLocationTeacher">선택 안 함</div></div>
+                    <div class="summary-item"><div class="summary-label">메뉴:</div><div class="summary-value" id="summaryMenu">선택 안 함</div></div>
+                    <div class="summary-item"><div class="summary-label">온도:</div><div class="summary-value" id="summaryTemp">선택 안 함</div></div>
+                    <div class="summary-item"><div class="summary-label">컵:</div><div class="summary-value" id="summaryTumbler">다회용 컵</div></div>
+                    <div class="summary-item"><div class="summary-label">기타사항:</div><div class="summary-value" id="summaryOptions">선택 안 함</div></div>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-label">메뉴:</div>
-                    <div class="summary-value" id="summaryMenu">선택 안 함</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">온도:</div>
-                    <div class="summary-value" id="summaryTemp">선택 안 함</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">텀블러:</div>
-                    <div class="summary-value" id="summaryTumbler">텀블러 없음</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">기타사항:</div>
-                    <div class="summary-value" id="summaryOptions">선택 안 함</div>
-                </div>
-            </div>
 
-            <div class="action-buttons">
-                <button class="btn btn-submit" onclick="submitOrder()">주문하기</button>
-                <button class="btn btn-reset" onclick="resetForm()">초기화</button>
+                <div class="action-buttons">
+                    <button class="btn btn-submit" onclick="submitOrder()">주문하기</button>
+                    <button class="btn btn-reset" onclick="resetForm()">초기화</button>
+                </div>
             </div>
         </div>
         
-        <div class="order-history-section">
-            <h2>📝 오늘의 주문 내역</h2>
-            <div class="order-table-container">
-                <table class="order-table">
-                    <thead>
-                        <tr>
-                            <th>순번</th>
-                            <th>위치/선생님</th>
-                            <th>메뉴</th>
-                            <th>온도</th>
-                            <th>텀블러</th>
-                            <th>기타사항</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orderList">
-                        </tbody>
-                </table>
+        <div id="adminMode" class="content-area">
+            <div class="order-history-section">
+                <h2>📋 주문 현황</h2>
+                <div class="order-table-container">
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>순번</th>
+                                <th>위치/선생님</th>
+                                <th>메뉴</th>
+                                <th>온도</th>
+                                <th>컵</th>
+                                <th>기타사항</th>
+                                <th>제조 완료</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderList"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -725,20 +645,19 @@
             teacher: null,
             menu: null,
             temp: null,
-            tumbler: '텀블러 없음',
+            cup: '다회용 컵',
             tumblerNumber: null,
             options: []
         };
-        let orderCount = 0;
+        let orders = [];
 
-        // HTML 요소 선택
         const locationItems = document.querySelectorAll('.location-item');
         const teacherGrid = document.getElementById('teacherGrid');
         const noLocationMsg = document.getElementById('noLocationMsg');
         const menuItems = document.querySelectorAll('.menu-item');
         const tempOptions = document.querySelectorAll('.temp-option');
         const tempWarning = document.getElementById('tempWarning');
-        const tumblerRadios = document.querySelectorAll('input[name="tumbler"]');
+        const cupRadios = document.querySelectorAll('input[name="tumbler"]');
         const tumblerNumbers = document.getElementById('tumblerNumbers');
         const tumblerNumBtns = document.querySelectorAll('.tumbler-num-btn');
         const optionCheckboxes = document.querySelectorAll('.option-checkbox');
@@ -749,19 +668,35 @@
         const summaryTumbler = document.getElementById('summaryTumbler');
         const summaryOptions = document.getElementById('summaryOptions');
         const orderList = document.getElementById('orderList');
+        
+        function switchMode(mode) {
+            const allModes = document.querySelectorAll('.content-area');
+            const allBtns = document.querySelectorAll('.mode-btn');
 
-        // 요약 정보 업데이트 함수
+            allModes.forEach(el => el.classList.remove('active'));
+            allBtns.forEach(el => el.classList.remove('active'));
+
+            if (mode === 'order') {
+                document.getElementById('orderMode').classList.add('active');
+                document.querySelector('.mode-btn:nth-child(1)').classList.add('active');
+            } else if (mode === 'admin') {
+                document.getElementById('adminMode').classList.add('active');
+                document.querySelector('.mode-btn:nth-child(2)').classList.add('active');
+                renderAdminTable();
+            }
+        }
+        
         function updateSummary() {
             summaryLocationTeacher.textContent = selected.location && selected.teacher
                 ? `${selected.location} / ${selected.teacher}`
                 : '선택 안 함';
             summaryMenu.textContent = selected.menu || '선택 안 함';
             summaryTemp.textContent = selected.temp || '선택 안 함';
-
-            if (selected.tumbler === '텀블러 있음') {
-                summaryTumbler.textContent = `텀블러 있음 (${selected.tumblerNumber || '번호 미선택'})`;
+            
+            if (selected.cup === '개인 텀블러') {
+                summaryTumbler.textContent = `개인 텀블러 (${selected.tumblerNumber || '번호 미선택'})`;
             } else {
-                summaryTumbler.textContent = '텀블러 없음';
+                summaryTumbler.textContent = '다회용 컵';
             }
 
             summaryOptions.textContent = selected.options.length > 0
@@ -769,17 +704,16 @@
                 : '선택 안 함';
         }
 
-        // 모든 선택 사항 초기화 함수
-        function resetAllSelections() {
+        function resetForm() {
             Object.keys(selected).forEach(key => selected[key] = null);
-            selected.tumbler = '텀블러 없음';
+            selected.cup = '다회용 컵';
             selected.options = [];
 
             document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
             document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
-            document.querySelector('input[name="tumbler"][value="no"]').checked = true;
+            document.querySelector('input[name="tumbler"][value="다회용 컵"]').checked = true;
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
-
+            
             teacherGrid.classList.remove('show');
             teacherGrid.innerHTML = '';
             noLocationMsg.style.display = 'block';
@@ -791,7 +725,6 @@
             updateSummary();
         }
 
-        // 선생님 버튼 생성 함수
         function createTeacherButtons(location) {
             teacherGrid.innerHTML = '';
             const teachers = teachersByLocation[location];
@@ -815,7 +748,6 @@
             }
         }
 
-        // 이벤트 리스너 설정
         locationItems.forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.location-item').forEach(el => el.classList.remove('selected'));
@@ -840,19 +772,10 @@
                 tempWarning.style.display = 'none';
                 selected.temp = null;
 
-                const hotOnlyMenus = []; // 요청에 따라 HOT만 가능한 메뉴는 없음
                 const iceOnlyMenus = ['아샷추', '복숭아 아이스티', '레몬 아이스티'];
-
-                if (hotOnlyMenus.includes(selected.menu)) {
-                    tempOptions[1].classList.add('disabled');
-                    tempOptions[0].classList.add('selected');
-                    selected.temp = 'HOT';
-                    tempWarning.textContent = '⚠️ ' + selected.menu + '는 HOT만 가능합니다!';
-                    tempWarning.style.display = 'block';
-                } else if (iceOnlyMenus.includes(selected.menu)) {
+                if (iceOnlyMenus.includes(selected.menu)) {
                     tempOptions[0].classList.add('disabled');
-                    tempOptions[1].classList.add('selected');
-                    selected.temp = 'ICE';
+                    tempOptions[1].click();
                     tempWarning.textContent = '⚠️ ' + selected.menu + '는 ICE만 가능합니다!';
                     tempWarning.style.display = 'block';
                 }
@@ -871,14 +794,13 @@
             });
         });
 
-        tumblerRadios.forEach(radio => {
+        cupRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                if (radio.value === 'yes') {
+                selected.cup = radio.value;
+                if (selected.cup === '개인 텀블러') {
                     tumblerNumbers.classList.add('show');
-                    selected.tumbler = '텀블러 있음';
                 } else {
                     tumblerNumbers.classList.remove('show');
-                    selected.tumbler = '텀블러 없음';
                     selected.tumblerNumber = null;
                     document.querySelectorAll('.tumbler-num-btn').forEach(btn => btn.classList.remove('selected'));
                 }
@@ -903,61 +825,77 @@
                 updateSummary();
             });
         });
-
-        // 주문 내역 테이블에 추가
-        function addOrderToTable() {
-            orderCount++;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${orderCount}</td>
-                <td>${selected.location} / ${selected.teacher}</td>
-                <td>${selected.menu}</td>
-                <td>${selected.temp}</td>
-                <td>${selected.tumbler === '텀블러 있음' ? `텀블러 있음 (${selected.tumblerNumber || '번호 미선택'})` : '텀블러 없음'}</td>
-                <td>${selected.options.length > 0 ? selected.options.join(', ') : '없음'}</td>
-            `;
-            orderList.appendChild(row);
-        }
-
-        // 주문하기 버튼 클릭 시
+        
         function submitOrder() {
             if (!selected.location || !selected.teacher || !selected.menu || !selected.temp) {
                 alert('위치, 선생님, 메뉴, 온도를 모두 선택해주세요.');
                 return;
             }
 
-            if (selected.tumbler === '텀블러 있음' && !selected.tumblerNumber) {
+            if (selected.cup === '개인 텀블러' && !selected.tumblerNumber) {
                 alert('텀블러 번호를 선택해주세요.');
                 return;
             }
 
             const confirmMsg = `주문하시겠습니까?
-- 위치: ${selected.location}
-- 선생님: ${selected.teacher}
-- 메뉴: ${selected.menu} (${selected.temp})
-- 텀블러: ${selected.tumbler === '텀블러 있음' ? `텀블러 있음 (${selected.tumblerNumber}번)` : '텀블러 없음'}
+- 위치/선생님: ${selected.location} / ${selected.teacher}
+- 메뉴: ${selected.menu}
+- 온도: ${selected.temp}
+- 컵: ${selected.cup}${selected.cup === '개인 텀블러' ? ' (' + selected.tumblerNumber + '번)' : ''}
 - 기타사항: ${selected.options.length > 0 ? selected.options.join(', ') : '없음'}`;
 
             if (confirm(confirmMsg)) {
-                addOrderToTable();
-                alert('주문이 접수되었습니다! 다음 주문을 이어서 받아주세요.');
+                const newOrder = {
+                    id: Date.now(),
+                    location: selected.location,
+                    teacher: selected.teacher,
+                    menu: selected.menu,
+                    temp: selected.temp,
+                    cup: selected.cup,
+                    tumblerNumber: selected.tumblerNumber,
+                    options: selected.options,
+                    isCompleted: false
+                };
+                orders.unshift(newOrder); // Add to the beginning of the array
+                alert('주문이 완료되었습니다!');
                 resetForm();
+                renderAdminTable();
             }
         }
+        
+        function renderAdminTable() {
+            orderList.innerHTML = '';
+            orders.forEach((order, index) => {
+                const row = document.createElement('tr');
+                if (order.isCompleted) {
+                    row.classList.add('completed');
+                }
+                row.innerHTML = `
+                    <td>${orders.length - index}</td>
+                    <td>${order.location} / ${order.teacher}</td>
+                    <td>${order.menu}</td>
+                    <td>${order.temp}</td>
+                    <td>${order.cup === '개인 텀블러' ? `개인 텀블러 (${order.tumblerNumber}번)` : '다회용 컵'}</td>
+                    <td>${order.options.length > 0 ? order.options.join(', ') : '-'}</td>
+                    <td>
+                        <input type="checkbox" class="complete-checkbox" data-order-id="${order.id}" ${order.isCompleted ? 'checked' : ''}>
+                    </td>
+                `;
+                orderList.appendChild(row);
+            });
 
-        // 초기화 버튼 클릭 시
-        function resetForm() {
-            resetAllSelections();
-            updateSummary();
+            // Add event listeners for the new checkboxes
+            document.querySelectorAll('.complete-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const orderId = parseInt(e.target.dataset.orderId);
+                    const order = orders.find(o => o.id === orderId);
+                    if (order) {
+                        order.isCompleted = e.target.checked;
+                        renderAdminTable(); // Re-render the table to reflect changes
+                    }
+                });
+            });
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('input[name="tumbler"][value="no"]').checked = true;
-            updateSummary();
-        });
     </script>
 </body>
-
 </html>
-
-
